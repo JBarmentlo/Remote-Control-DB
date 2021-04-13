@@ -7,11 +7,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'this-really-needs-to-be-changed'
-    try:
-        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL_2']
-    except:
-        print("NO SQL DB URI")
-        SQLALCHEMY_DATABASE_URI = "fuck"
+    SQLALCHEMY_DATABASE_URI = os.environ["DB_URL"]
 
 
 class ProductionConfig(Config):
@@ -26,7 +22,8 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:suki@localhost:5432/resbot_dev"
+    SQLALCHEMY_DATABASE_URI = "postgresql://yup:paspas@localhost:5432/remotecontrol"
+
 
 
 class TestingConfig(Config):
