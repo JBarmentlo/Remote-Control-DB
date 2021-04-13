@@ -4,8 +4,8 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_wtf import FlaskForm
 from forms import LoginForm, RegistrationForm
+import flask
 
 
 app = Flask(__name__)
@@ -30,6 +30,9 @@ def user_loader(username):
 
 @app.route('/')
 def hello():
+    res = User.query.filter_by(username="yoopster").first()
+    print(res.pas)
+    print(bcrypt.check_password_hash(res.pas, "aaa"))
     return "Hello World!"
 
 
@@ -44,11 +47,17 @@ def login():
         # user should be an instance of your `User` class
         print(bcrypt.generate_password_hash(form.username.data))
         print(form.username.data)
-        # pw_hash = bcrypt.generate_password_hash('hunter2')
-        # bcrypt.check_password_hash(pw_hash, 'hunter2') # returns True
-        print("yeye")
-        return("LOL")
-        # login_user(user)
+        print(form.password.data)
+        res = User.query.filter_by(username=form.username.data).first()
+        print(res)
+        print(res.pas)
+        if (res is None):
+            return render_template('login.html', form=form)
+        if (bcrypt.check_password_hash(res.pas, form.password.data)):
+            print("Loged In")
+            login_user(user)
+        else:
+            print("NOPE")
 
         flask.flash('Logged in successfully.')
 
@@ -58,25 +67,25 @@ def login():
         # if not is_safe_url(next):
         #     return flask.abort(400)
 
-        return flask.redirect(next or flask.url_for('index'))
+        # return flask.redirect(next or flask.url_for('index'))s
     return render_template('login.html', form=form)
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
-        user = User(form.username.data, form.email.data,
-                    form.password.data)
-        db_session.add(user)
-        flash('Thanks for registering')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
-
-# @app.route('/')
-# @login_required
-# def hello():
-#     return "Hello World!"
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        if (bcrypt.check_password_hash(b'$2b$12$H0im14vPWMOFm/bao3A1Neb4wXQsNisL4N3SRQl5WPCkuVazUIAWa', form.adminpas.data)):
+            res = User.query.filter_by(username=form.username.data).first()
+            if (res is not None):
+                return render_template('signup.html', form=form, error = "Username already taken")
+            user = User(form.username.data, bcrypt.generate_password_hash(form.password.data), form.email.data)
+            db.session.add(user)
+            db.session.commit()
+            print(f"user registered -{form.username.data}-  -{form.password.data}-")
+        flask.flash('Thanks for registering')
+        return redirect('/login')
+    return render_template('signup.html', form=form, error = "")
 
 
 # @app.route("/login", methods=["GET", "POST"])

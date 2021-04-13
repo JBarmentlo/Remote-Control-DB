@@ -27,7 +27,7 @@ class User(db.Model):
 
     # tasks = relationship("Task")
     
-    def __init__(self, username, pas, mail, authenticated):
+    def __init__(self, username, pas, mail, authenticated = False):
         self.username = username
         self.pas = pas
         self.mail = mail
