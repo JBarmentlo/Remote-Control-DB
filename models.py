@@ -24,8 +24,8 @@ class User(db.Model):
         return True
 
     def get_id(self):
-        """Return the email address to satisfy Flask-Login's requirements."""
-        return self.email
+        """Return the username to satisfy Flask-Login's requirements."""
+        return self.username
 
     def is_authenticated(self):
         """Return True if the user is authenticated."""
