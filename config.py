@@ -11,7 +11,10 @@ class Config(object):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ["DB_URL"]
+    try:
+        SQLALCHEMY_DATABASE_URI = os.environ["DB_URL"]
+    except:
+        pass
 
 
 
