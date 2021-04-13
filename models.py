@@ -1,5 +1,19 @@
 from app import db
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.types import String, TypeDecorator
+
+
+class HexByteString(TypeDecorator):
+    """Convert Python bytestring to string with hexadecimal digits and back for storage."""
+
+    impl = String
+
+    def process_bind_param(self, value, dialect):
+        if not isinstance(value, bytes):
+            raise TypeError("HexByteString columns support only bytes values.")
+        return value.hex()
+
+    def process_result_value(self, value, dialect):
+        return bytes.fromhex(value) if value else None
 
 
 class User(db.Model):
@@ -7,7 +21,7 @@ class User(db.Model):
 
     # id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(), primary_key=True)
-    pas = db.Column(db.String())
+    pas = db.Column(HexByteString)
     mail = db.Column(db.String())
     authenticated = db.Column(db.Boolean, default=False)
 

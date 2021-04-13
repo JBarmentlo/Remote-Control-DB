@@ -1,7 +1,12 @@
-from flask import Flask
+from flask import Flask, render_template, redirect
+from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm
+from forms import LoginForm, RegistrationForm
+
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -9,17 +14,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+bcrypt = Bcrypt(app)
+login_manager.login_view = 'login'
 
 from models import *
 
 @login_manager.user_loader
-def user_loader(user_id):
+def user_loader(username):
     """Given *user_id*, return the associated User object.
 
     :param unicode user_id: user_id (username) user to retrieve
 
     """
-    return User.query.get(user_id)
+    return User.query.get(username)
 
 @app.route('/')
 def hello():
@@ -35,18 +42,36 @@ def login():
     if form.validate_on_submit():
         # Login and validate the user.
         # user should be an instance of your `User` class
-        login_user(user)
+        print(bcrypt.generate_password_hash(form.username.data))
+        print(form.username.data)
+        # pw_hash = bcrypt.generate_password_hash('hunter2')
+        # bcrypt.check_password_hash(pw_hash, 'hunter2') # returns True
+        print("yeye")
+        return("LOL")
+        # login_user(user)
 
         flask.flash('Logged in successfully.')
 
-        next = flask.request.args.get('next')
-        # is_safe_url should check if the url is safe for redirects.
-        # See http://flask.pocoo.org/snippets/62/ for an example.
-        if not is_safe_url(next):
-            return flask.abort(400)
+        # next = flask.request.args.get('next')
+        # # is_safe_url should check if the url is safe for redirects.
+        # # See http://flask.pocoo.org/snippets/62/ for an example.
+        # if not is_safe_url(next):
+        #     return flask.abort(400)
 
         return flask.redirect(next or flask.url_for('index'))
-    return flask.render_template('login.html', form=form)
+    return render_template('login.html', form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = User(form.username.data, form.email.data,
+                    form.password.data)
+        db_session.add(user)
+        flash('Thanks for registering')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
 
 # @app.route('/')
 # @login_required
@@ -84,5 +109,5 @@ def login():
 #     logout_user()
 #     return render_template("logout.html")
 
-# if __name__ == '__main__':
-#     app.run()
+if __name__ == '__main__':
+    app.run()
