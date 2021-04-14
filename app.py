@@ -1,11 +1,12 @@
 from flask import Flask, render_template, redirect
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm
 import flask
+from is_safe_url import is_safe_url
 
 
 app = Flask(__name__)
@@ -48,26 +49,27 @@ def login():
         print(bcrypt.generate_password_hash(form.username.data))
         print(form.username.data)
         print(form.password.data)
-        res = User.query.filter_by(username=form.username.data).first()
-        print(res)
-        print(res.pas)
-        if (res is None):
+        user = User.query.filter_by(username=form.username.data).first()
+        print(user)
+        print(user.pas)
+        if (user is None):
             return render_template('login.html', form=form)
-        if (bcrypt.check_password_hash(res.pas, form.password.data)):
-            print("Loged In")
+
+        if (bcrypt.check_password_hash(user.pas, form.password.data)):
+            print("Logged In")
             login_user(user)
+            next = flask.request.args.get('next')
+            # is_safe_url should check if the url is safe for redirects.
+            # See http://flask.pocoo.org/snippets/62/ for an example.
+            if not is_safe_url(next):
+                return flask.abort(400)
+            flask.flash('Logged in successfully.')
+            return flask.redirect(next or flask.url_for('index'))
+
         else:
             print("NOPE")
 
-        flask.flash('Logged in successfully.')
 
-        # next = flask.request.args.get('next')
-        # # is_safe_url should check if the url is safe for redirects.
-        # # See http://flask.pocoo.org/snippets/62/ for an example.
-        # if not is_safe_url(next):
-        #     return flask.abort(400)
-
-        # return flask.redirect(next or flask.url_for('index'))s
     return render_template('login.html', form=form)
 
 
