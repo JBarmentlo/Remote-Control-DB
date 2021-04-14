@@ -31,9 +31,6 @@ def user_loader(username):
 
 @app.route('/')
 def hello():
-    res = User.query.filter_by(username="yoopster").first()
-    print(res.pas)
-    print(bcrypt.check_password_hash(res.pas, "aaa"))
     return "Hello World!"
 
 
