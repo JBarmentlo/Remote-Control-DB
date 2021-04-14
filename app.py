@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_user, login_required
+from flask_login import LoginManager, login_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -58,19 +58,19 @@ def login():
             next = flask.request.args.get('next')
             # is_safe_url should check if the url is safe for redirects.
             # See http://flask.pocoo.org/snippets/62/ for an example.
-            if not is_safe_url(next):
+            if next is not None and not is_safe_url(next, {os.environ["SAFE_HOSTS"]}):
                 return flask.abort(400)
             flask.flash('Logged in successfully.')
-            return flask.redirect(next or flask.url_for('index'))
+            return flask.redirect(next or flask.url_for('signup'))
 
         else:
             print("NOPE")
-
 
     return render_template('login.html', form=form)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
+@login_required
 def signup():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -86,36 +86,16 @@ def signup():
         return redirect('/login')
     return render_template('signup.html', form=form, error = "")
 
-
-# @app.route("/login", methods=["GET", "POST"])
-# def login():
-#     """For GET requests, display the login form. 
-#     For POSTS, login the current user by processing the form.
-
-#     """
-#     # print db
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         user = User.query.get(form.email.data)
-#         if user:
-#             if bcrypt.check_password_hash(user.password, form.password.data):
-#                 user.authenticated = True
-#                 db.session.add(user)
-#                 db.session.commit()
-#                 login_user(user, remember=True)
-#                 return redirect(url_for("bull.reports"))
-#     return render_template("login.html", form=form)
-
-# @app.route("/logout", methods=["GET"])
-# @login_required
-# def logout():
-#     """Logout the current user."""
-#     user = current_user
-#     user.authenticated = False
-#     db.session.add(user)
-#     db.session.commit()
-#     logout_user()
-#     return render_template("logout.html")
+@app.route("/logout", methods=["GET"])
+@login_required
+def logout():
+    """Logout the current user."""
+    user = current_user
+    user.authenticated = False
+    db.session.add(user)
+    db.session.commit()
+    logout_user()
+    return render_template("logout.html")
 
 if __name__ == '__main__':
     app.run()

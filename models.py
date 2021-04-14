@@ -59,6 +59,8 @@ class Task(db.Model):
     task_id = db.Column(db.Integer(), primary_key = True)
     task = db.Column(db.String())
     username = db.Column(db.String())
+    status = db.Column(db.String())
+    date = db.Column(db.String())
     # user = db.Column(sb.String, ForeignKey('users.username'))
 
     def __init__(self, task_id, task, username):
