@@ -1,7 +1,8 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm
@@ -19,6 +20,7 @@ bcrypt = Bcrypt(app)
 login_manager.login_view = 'login'
 
 from models import *
+SQLAlchemy
 
 @login_manager.user_loader
 def user_loader(username):
@@ -29,9 +31,25 @@ def user_loader(username):
     """
     return User.query.get(username)
 
-@app.route('/')
+def get_new_task_id():
+    last_task = db.session.query(Task).filter(Task.task_id == db.session.query(func.max(Task.task_id))).first()
+    if (last_task is not None):
+        last_id = last_task.task_id + 1
+    else:
+        last_id = 0
+    return last_id
+
+@app.route('/', methods=['GET', 'POST'])
+@login_required
 def hello():
-    return "Hello World!"
+    if request.method == "POST":
+        print(request.form)
+        task = Task(get_new_task_id(), request.form["text"], current_user.username)
+        db.session.add(task)
+        db.session.commit()
+        print("YEYEYEYEYEY POSTIN TASK")
+        return (f"succesfully uploaded task \n{request.form['text']}")
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])

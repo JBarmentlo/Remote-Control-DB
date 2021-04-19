@@ -1,6 +1,6 @@
 from app import db
 from sqlalchemy.types import String, TypeDecorator
-
+import datetime
 
 class HexByteString(TypeDecorator):
     """Convert Python bytestring to string with hexadecimal digits and back for storage."""
@@ -63,7 +63,9 @@ class Task(db.Model):
     date = db.Column(db.String())
     # user = db.Column(sb.String, ForeignKey('users.username'))
 
-    def __init__(self, task_id, task, username):
+    def __init__(self, task_id, task, username, status = "pending", date = str(datetime.datetime.now())):
         self.id = task_id
         self.task = task
-        self.username = usernmame
+        self.username = username
+        self.status = status
+        self.date = date
