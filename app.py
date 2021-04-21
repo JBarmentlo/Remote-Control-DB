@@ -88,7 +88,6 @@ def status():
 
 
 @app.route('/signup', methods=['GET', 'POST'])
-@login_required
 def signup():
     form = RegistrationForm()
     if form.validate_on_submit():
