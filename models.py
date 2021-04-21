@@ -61,11 +61,15 @@ class Task(db.Model):
     username = db.Column(db.String())
     status = db.Column(db.String())
     date = db.Column(db.String())
+    start_date = db.Column(db.String())
+    end_date = db.Column(db.String())
     # user = db.Column(sb.String, ForeignKey('users.username'))
 
-    def __init__(self, task_id, task, username, status = "pending", date = str(datetime.datetime.now())):
+    def __init__(self, task_id, task, username, status = "pending", date = str(datetime.datetime.now()), start_date = "", end_date = ""):
         self.id = task_id
         self.task = task
         self.username = username
         self.status = status
         self.date = date
+        self.start_date = start_date
+        self.end_date = end_date

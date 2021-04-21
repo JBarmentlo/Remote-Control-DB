@@ -47,8 +47,7 @@ def hello():
         task = Task(get_new_task_id(), request.form["text"], current_user.username)
         db.session.add(task)
         db.session.commit()
-        print("YEYEYEYEYEY POSTIN TASK")
-        return (f"succesfully uploaded task \n{request.form['text']}")
+        return render_template('successful_upload.html', task=task)
     return render_template('index.html')
 
 
@@ -61,12 +60,7 @@ def login():
     if form.validate_on_submit():
         # Login and validate the user.
         # user should be an instance of your `User` class
-        print(bcrypt.generate_password_hash(form.username.data))
-        print(form.username.data)
-        print(form.password.data)
         user = User.query.filter_by(username=form.username.data).first()
-        print(user)
-        print(user.pas)
         if (user is None):
             return render_template('login.html', form=form)
 
@@ -79,12 +73,18 @@ def login():
             if next is not None and not is_safe_url(next, {os.environ["SAFE_HOSTS"]}):
                 return flask.abort(400)
             flask.flash('Logged in successfully.')
-            return flask.redirect(next or flask.url_for('signup'))
-
+            return flask.redirect(next or flask.url_for('index'))
         else:
             print("NOPE")
 
     return render_template('login.html', form=form)
+
+
+@app.route('/status')
+@login_required
+def status():
+    tasks =  Task.query.filter_by(username=current_user.username).all()
+    return render_template('status.html', tasks=tasks)
 
 
 @app.route('/signup', methods=['GET', 'POST'])

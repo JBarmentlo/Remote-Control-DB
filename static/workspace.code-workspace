@@ -1,11 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "FlaskAppo",
 			"path": "../../FlaskAppo"
 		},
 		{
+			"name": "Remote-Control-DB",
 			"path": ".."
+		},
+		{
+			"name": "42_ResaBot",
+			"path": "../../42_ResaBot"
+		},
+		{
+			"name": "remoto",
+			"path": "../../remoto"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.pythonPath": "/home/yup/Desktop/Code/remoto/remoto-env/bin/python3"
+	}
 }
