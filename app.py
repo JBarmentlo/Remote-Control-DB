@@ -1,25 +1,18 @@
-from flask import Flask, render_template, redirect, request
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_user, login_required, current_user
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-import os
-from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegistrationForm
-import flask
-from is_safe_url import is_safe_url
 
 
-app = Flask(__name__)
-app.config.from_object(os.environ['APP_SETTINGS'])
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-login_manager = LoginManager()
-login_manager.init_app(app)
-bcrypt = Bcrypt(app)
-login_manager.login_view = 'login'
+# print(type(db.session()))
 
+# engine = engine(app.config["SQLALCHEMY_DATABASE_URI"])
+# session_factory = sessionmaker()
+from init import *
 from models import *
+
+print("h=o")
+print(type(db.session))
+print("he")
+print(type(db.session()))
+
+
 
 @login_manager.user_loader
 def user_loader(username):
@@ -29,17 +22,20 @@ def user_loader(username):
 
     """
     print ("user_LOADER")
-    user = User.query.get(username)
+    # with session_factory(expire_on_commit = false) as session
+    user = db.session.query(User).filter(User.username == username).first()
+    # db.session.object_session(user).rollback()
+    # db.session.commit()
     return user
 
-def get_new_task_id():
-    last_task = db.session.query(Task).filter(Task.task_id == db.session.query(func.max(Task.task_id))).first()
-    db.session.expunge(last_task)
-    if (last_task is not None):
-        last_id = last_task.task_id + 1
-    else:
-        last_id = 0
-    return last_id
+# def get_new_task_id():
+#     last_task = db.session.query(Task).filter(Task.task_id == db.session.query(func.max(Task.task_id))).first()
+#     if (last_task is not None):
+#         last_id = last_task.task_id + 1
+#     else:
+#         last_id = 0
+#     db.session.commit()
+#     return last_id
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -50,7 +46,7 @@ def home():
 def upload():
     if request.method == "POST":
         print(request.form)
-        task = Task(get_new_task_id(), request.form["text"], current_user.username)
+        task = Task(None, request.form["text"], current_user.username)
         db.session.add(task)
         db.session.commit()
         return render_template('successful_upload.html', task=task)
@@ -59,14 +55,9 @@ def upload():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Here we use a class of some kind to represent and validate our
-    # client-side form data. For example, WTForms is a library that will
-    # handle this for us, and we use a custom LoginForm to validate.
     form = LoginForm()
     if form.validate_on_submit():
-        # Login and validate the user.
-        # user should be an instance of your `User` class
-        user = User.query.filter_by(username=form.username.data).first()
+        user = db.session.query(User).filter_by(username=form.username.data).first()
         if (user is None):
             return render_template('login.html', form=form)
 
@@ -79,18 +70,19 @@ def login():
             if next is not None and not is_safe_url(next, {os.environ["SAFE_HOSTS"]}):
                 return flask.abort(400)
             flask.flash('Logged in successfully.')
-            db.session.remove()
+            db.session.commit()
             return flask.redirect(next or flask.url_for('upload'))
         else:
             print("NOPE")
-        db.session.remove()
+        db.session.commit()
     return render_template('login.html', form=form)
 
 
 @app.route('/status')
 @login_required
 def status():
-    tasks =  Task.query.filter_by(username=current_user.username).all()
+    tasks =  db.session.query(Task).filter_by(username=current_user.username).all()
+    db.session.commit()
     return render_template('status.html', tasks=tasks)
 
 
@@ -100,7 +92,7 @@ def signup():
     errors = []
     if form.validate_on_submit():
         if (bcrypt.check_password_hash(b'$2b$12$H0im14vPWMOFm/bao3A1Neb4wXQsNisL4N3SRQl5WPCkuVazUIAWa', form.adminpas.data)):
-            res = User.query.filter_by(username=form.username.data).first()
+            res = db.session.query(User).filter_by(username=form.username.data).first()
             if (res is not None):
                 errors.append("Username already taken")
                 return render_template('signup.html', form=form, error = errors)

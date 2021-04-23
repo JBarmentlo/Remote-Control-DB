@@ -1,4 +1,4 @@
-from app import db
+from init import db
 from sqlalchemy.types import String, TypeDecorator
 import datetime
 
