@@ -1,5 +1,7 @@
 alembic==1.5.8
 bcrypt==3.2.0
+boto3==1.17.56
+botocore==1.20.56
 certifi==2020.12.5
 cffi==1.14.5
 chardet==4.0.0
@@ -19,6 +21,7 @@ importlib-metadata==3.9.1
 is-safe-url==1.0
 itsdangerous==1.1.0
 Jinja2==2.11.3
+jmespath==0.10.0
 Mako==1.1.4
 MarkupSafe==1.1.1
 Naked==0.1.31
@@ -37,6 +40,7 @@ redis==3.5.3
 requests==2.25.1
 rq==1.7.0
 rsa==4.7.2
+s3transfer==0.4.2
 shellescape==3.8.1
 six==1.15.0
 SQLAlchemy==1.4.3
