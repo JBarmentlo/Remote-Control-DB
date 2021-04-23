@@ -20,7 +20,6 @@ bcrypt = Bcrypt(app)
 login_manager.login_view = 'login'
 
 from models import *
-SQLAlchemy
 
 @login_manager.user_loader
 def user_loader(username):
@@ -29,10 +28,13 @@ def user_loader(username):
     :param unicode user_id: user_id (username) user to retrieve
 
     """
-    return User.query.get(username)
+    print ("user_LOADER")
+    user = User.query.get(username)
+    return user
 
 def get_new_task_id():
     last_task = db.session.query(Task).filter(Task.task_id == db.session.query(func.max(Task.task_id))).first()
+    db.session.expunge(last_task)
     if (last_task is not None):
         last_id = last_task.task_id + 1
     else:
@@ -40,15 +42,19 @@ def get_new_task_id():
     return last_id
 
 @app.route('/', methods=['GET', 'POST'])
+def home():
+    return flask.redirect(flask.url_for('upload'))
+
+@app.route('/upload', methods=['GET', 'POST'])
 @login_required
-def hello():
+def upload():
     if request.method == "POST":
         print(request.form)
         task = Task(get_new_task_id(), request.form["text"], current_user.username)
         db.session.add(task)
         db.session.commit()
         return render_template('successful_upload.html', task=task)
-    return render_template('index.html')
+    return render_template('upload.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -73,10 +79,11 @@ def login():
             if next is not None and not is_safe_url(next, {os.environ["SAFE_HOSTS"]}):
                 return flask.abort(400)
             flask.flash('Logged in successfully.')
-            return flask.redirect(next or flask.url_for('index'))
+            db.session.remove()
+            return flask.redirect(next or flask.url_for('upload'))
         else:
             print("NOPE")
-
+        db.session.remove()
     return render_template('login.html', form=form)
 
 
@@ -90,18 +97,27 @@ def status():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegistrationForm()
+    errors = []
     if form.validate_on_submit():
         if (bcrypt.check_password_hash(b'$2b$12$H0im14vPWMOFm/bao3A1Neb4wXQsNisL4N3SRQl5WPCkuVazUIAWa', form.adminpas.data)):
             res = User.query.filter_by(username=form.username.data).first()
             if (res is not None):
-                return render_template('signup.html', form=form, error = "Username already taken")
+                errors.append("Username already taken")
+                return render_template('signup.html', form=form, error = errors)
             user = User(form.username.data, bcrypt.generate_password_hash(form.password.data), form.email.data)
-            db.session.add(user)
-            db.session.commit()
-            print(f"user registered -{form.username.data}-  -{form.password.data}-")
-        flask.flash('Thanks for registering')
-        return redirect('/login')
-    return render_template('signup.html', form=form, error = "")
+            try:
+                db.session.add(user)
+                db.session.commit()
+            except:
+                errors.append("Something went wrong with the database")
+            print(f"user registered -{form.username.data}-")
+            flask.flash('Thanks for registering')
+            return redirect('/login')
+        else:
+            errors.append("Wrong adminpas")
+    else:
+        errors.append("Form invalid (maybe you didnt type the same password twice), username needs to be 4-25 chars long")
+    return render_template('signup.html', form=form, error = errors)
 
 @app.route("/logout", methods=["GET"])
 @login_required
@@ -116,3 +132,8 @@ def logout():
 
 if __name__ == '__main__':
     app.run()
+
+@app.teardown_appcontext
+def shutdown_session(*args, **kwargs):
+    print("TEARDOOOOWN\n\n")
+    # db.session.remove()
