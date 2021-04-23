@@ -70,11 +70,11 @@ def login():
             if next is not None and not is_safe_url(next, {os.environ["SAFE_HOSTS"]}):
                 return flask.abort(400)
             flask.flash('Logged in successfully.')
-            db.session.commit()
+            # db.session.commit()
             return flask.redirect(next or flask.url_for('upload'))
         else:
             print("NOPE")
-        db.session.commit()
+        # db.session.commit()
     return render_template('login.html', form=form)
 
 
