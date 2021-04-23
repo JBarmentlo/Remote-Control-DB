@@ -8,11 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm
 import flask
 from is_safe_url import is_safe_url
-import logging 
-# from sqlalchemy import text, engine
-# from sqlalchemy.orm import sessionmaker, scoped_session
 
-# Session = scoped_session(session_factory)
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -21,3 +17,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 bcrypt = Bcrypt(app)
 login_manager.login_view = 'login'
+
+# environment = jinja2.Environment(whatever)
+# environment.filters['timesince'] = timesince

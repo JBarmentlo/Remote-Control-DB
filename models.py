@@ -73,3 +73,16 @@ class Task(db.Model):
         self.date = date
         self.start_date = start_date
         self.end_date = end_date
+        self.set_run_time()
+
+    def get_run_time(self):
+        try:
+            return str(datetime.datetime.strptime(self.end_date, '%Y-%m-%d %H:%M:%S.%f') - datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S.%f')).split('.')[0]
+        except:
+            return ""
+
+    def set_run_time(self):
+        try:
+            self.execution_time = str(datetime.datetime.strptime(self.end_date, '%Y-%m-%d %H:%M:%S.%f') - datetime.datetime.strptime(self.start_date, '%Y-%m-%d %H:%M:%S.%f')).split('.')[0]
+        except:
+            self.execution_time = ""

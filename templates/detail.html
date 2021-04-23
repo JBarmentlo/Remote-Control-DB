@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Details for taks {{task.task_id}}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<pre>
+<table class='table' id="vertical-1">
+    <tr>
+        <th>Upload date</th>
+        <td>{{task.date.split('.')[0]}}</td>
+    </tr>
+    <tr>
+        <th>Start date</th>
+        <td>{{task.start_date.split('.')[0]}}</td>
+    </tr>
+    <tr>
+        <th>Finish date</th>
+        <td>{{task.end_date.split('.')[0]}}</td>
+    </tr>
+    <tr>
+        <th>Total time</th>
+        <td>{{task.execution_time.split('.')[0]}}</td>
+    </tr>
+    <tr>
+        <th>Task Content</th>
+        <td>{{task.task}}</td>
+    </tr>
+    <tr>
+        <th>Stdout</th>
+        <td>{{stdout}}</td>
+    </tr>
+    <tr>
+        <th>Stderr</th>
+        <td>{{stderr}}</td>
+    </tr>
+</table>
+</pre>
+</body>
+</html>

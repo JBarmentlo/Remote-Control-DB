@@ -1,18 +1,8 @@
-
-
-# print(type(db.session()))
-
-# engine = engine(app.config["SQLALCHEMY_DATABASE_URI"])
-# session_factory = sessionmaker()
 from init import *
 from models import *
-
-print("h=o")
-print(type(db.session))
-print("he")
-print(type(db.session()))
-
-
+from server import *
+from s3 import get_log_strings
+import datetime
 
 @login_manager.user_loader
 def user_loader(username):
@@ -21,21 +11,9 @@ def user_loader(username):
     :param unicode user_id: user_id (username) user to retrieve
 
     """
-    print ("user_LOADER")
-    # with session_factory(expire_on_commit = false) as session
     user = db.session.query(User).filter(User.username == username).first()
-    # db.session.object_session(user).rollback()
-    # db.session.commit()
     return user
 
-# def get_new_task_id():
-#     last_task = db.session.query(Task).filter(Task.task_id == db.session.query(func.max(Task.task_id))).first()
-#     if (last_task is not None):
-#         last_id = last_task.task_id + 1
-#     else:
-#         last_id = 0
-#     db.session.commit()
-#     return last_id
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -81,8 +59,9 @@ def login():
 @app.route('/status')
 @login_required
 def status():
-    tasks =  db.session.query(Task).filter_by(username=current_user.username).all()
-    db.session.commit()
+    tasks =  get_tasks_by_user(current_user)
+    for task in tasks:
+        task.set_run_time() 
     return render_template('status.html', tasks=tasks)
 
 
@@ -122,6 +101,14 @@ def logout():
     logout_user()
     return render_template("logout.html")
 
+@app.route("/details/<taskid>")
+def details(taskid):
+    task = get_task_by_id(taskid)
+    out, err = get_log_strings(task.task_id)
+    return render_template("detail.html", task = task, stdout = out, stderr = err)
+
+
+
 if __name__ == '__main__':
     app.run()
 
@@ -129,3 +116,4 @@ if __name__ == '__main__':
 def shutdown_session(*args, **kwargs):
     print("TEARDOOOOWN\n\n")
     # db.session.remove()
+

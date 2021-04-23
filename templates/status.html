@@ -7,6 +7,7 @@
     
 </head>
 <body>
+    <pre>
     <table class="table">
         <thead class="thead-dark">
             <tr>
@@ -16,6 +17,8 @@
                 <th scope="col">Upload Date</th>
                 <th scope="col">Start Date</th>
                 <th scope="col">Finish Date</th>
+                <th scope="col">Execution Time</th>
+                <th scope="col">Details / Logs</th>
             </tr>
         </thead>
         <tbody>
@@ -24,13 +27,16 @@
                     <th scope="row">{{task.task_id}}</th>
                     <td>{{task.task}}</td>
                     <td>{{task.status}}</td>
-                    <td>{{task.date}}</td>
-                    <td>{{task.start_date}}</td>
-                    <td>{{task.end_date}}</td>
+                    <td>{{task.date.split('.')[0]}}</td>
+                    <td>{{task.start_date.split('.')[0]}}</td>
+                    <td>{{task.end_date.split('.')[0]}}</td>
+                    <td>{{task.execution_time}}</td>
+                    <td><a href="{{ url_for('details', taskid=task.task_id)}}">Details Page</a></td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    </pre>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
