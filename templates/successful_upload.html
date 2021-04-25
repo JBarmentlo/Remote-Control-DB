@@ -3,11 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>Succesful upload</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='navbar.css')}}">
 </head>
 <body>
+  <nav><div class="__navbar">
+    <div class="__navbar-logo">
+      <h1>Ze Remote</h1>
+    </div>
+    <div class="__navbar-menu">
+    <ul class="__navbar-menu-close">
+      <a href="{{url_for('upload')}}"><li><span>Upload</span></li></a>
+      <a href="{{url_for('status')}}"><li><span>Tasks Status</span></li></a>
+      <!-- <a href="{url_for('')}"><li><span>About</span></li></a> -->
+    </ul>
+  </nav>
+  <div class="__content">
+    <div class="__section">
       <h1>Sucessfully submitted your task</h1>
       <pre>-----------------------------------------</pre>
       <pre>{{task.task}}</pre>
       <pre>-----------------------------------------</pre>
+    </div>
+  </div>
+  <script  src="{{url_for('static', filename='navbar.js')}}"></script>
 </body>
 </html>

@@ -1,0 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
+
+/* base css */
+:root {
+  --navbar_background: #0085c9;
+  --navbar_font: #eee;
+  --navbar_menu_hover: #0072ac;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+/* Navbar Css */
+
+.__navbar {
+  display: flex;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 50px;
+  background: var(--navbar_background);
+  color: var(--navbar_font);
+  align-items: center;
+}
+
+/* Navbar Logo */
+.__navbar-logo {
+  width: 50%;
+  margin: 0 0 0 2%;
+}
+
+/* Navbar Menu */
+
+.__navbar-menu {
+  display: flex;
+  width: 50%;
+  margin: 0 0 0 0;
+  height: 100%;
+  align-items: center;
+}
+
+.__navbar-menu ul {
+  display: flex;
+  list-style: none;
+  width: 100%;
+  height: 100%;
+  justify-content: space-around;
+}
+
+.__navbar-menu a {
+  color: var(--navbar-font);
+  text-decoration: none;
+  width: 100%;
+  height: 100%;
+}
+
+.__navbar-menu ul li {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.__navbar-menu ul li:hover {
+  background: var(--navbar_menu_hover);
+}
+
+/* Hamburger */
+
+.__hamburger {
+  display: none;
+  flex-direction: column;
+  height: 40px;
+  width: 45px;
+  justify-content: space-around;
+  margin: 0 2% 0 0;
+  cursor: pointer;
+}
+
+.__hamburger div {
+  width: 40px;
+  height: 4px;
+  background: white;
+}
+
+.__section{
+    padding: 60px 10px;
+}
+
+@media only screen and (max-width: 800px) {
+  .__navbar-menu ul {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    margin: 0 0 0 0;
+    z-index: 1;
+    background: var(--navbar_background);
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .__navbar-menu-open {
+    right: 0;
+    transition: 0.5s ease;
+  }
+  .__navbar-menu-close {
+    right: -100vw;
+    transition: 0.5s ease;
+  }
+
+  .__navbar-menu {
+    justify-content: flex-end;
+  }
+  .__hamburger {
+    display: flex;
+    z-index: 2;
+  }
+}
