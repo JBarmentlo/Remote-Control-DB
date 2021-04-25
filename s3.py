@@ -37,3 +37,6 @@ def get_log_strings(task_id, bucket = bucket):
     
     return (out_str, err_str)
 
+
+def create_obj(key, bucket = bucket):
+    bucket.put_object(Key="picture_log/" + key)

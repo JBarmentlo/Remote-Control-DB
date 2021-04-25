@@ -1,8 +1,9 @@
 from init import *
 from models import *
 from server import *
-from s3 import get_log_strings
+from s3 import get_log_strings, create_obj
 import datetime
+from flask import send_from_directory
 
 @login_manager.user_loader
 def user_loader(username):
@@ -18,6 +19,12 @@ def user_loader(username):
 @app.route('/', methods=['GET', 'POST'])
 def home():
     return flask.redirect(flask.url_for('upload'))
+
+@app.route('/profilepic/<name>', methods=['GET', 'POST'])
+def profilepic(name):
+    create_obj(name)
+    return send_from_directory('static', 'pic.jpg')
+    
 
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
