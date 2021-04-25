@@ -23,13 +23,17 @@ def get_log_strings(task_id, bucket = bucket):
 
     try:
         out_str = out.get()['Body'].read().decode('ascii')
+    except s3.meta.client.exceptions.NoSuchKey:
+        out_str = f"There is no log file. \nThis is normal if your task hasn't been completed yet"
     except Exception as e:
         out_str = f"there was an error: {e}"
 
     try:
         err_str = err.get()['Body'].read().decode('utf-8')
+    except s3.meta.client.exceptions.NoSuchKey:
+        err_str = f"There is no log file. \nThis is normal if your task hasn't been completed yet"
     except Exception as e:
-        out_str = f"there was an error: {e}"
+        err_str = f"there was an error: {e}"
     
     return (out_str, err_str)
 
