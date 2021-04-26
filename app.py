@@ -22,7 +22,7 @@ def home():
 
 @app.route('/profilepic/<name>', methods=['GET', 'POST'])
 def profilepic(name):
-    create_obj(name)
+    create_obj(name + "_" + str(datetime.datetime.now()).split('.')[0])
     return send_from_directory('static', 'pic.jpg')
     
 
